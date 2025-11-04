@@ -1,0 +1,5 @@
+python-pptx==0.6.21
+# Pillow version pin relaxed due to build issues on Python 3.14; install latest compatible.
+Pillow
+PyYAML==6.0.2
+pywin32>=306
