@@ -222,6 +222,12 @@ To create a custom carousel template:
 - **OS**: Windows (required for PowerPoint COM automation)
 - **Memory**: Sufficient for loading presentation images (~50MB per deck)
 
+## Performance
+
+- **Speed**: Convert a 21-slide deck to carousel in under 30 seconds
+- **Transitions**: Add Morph transitions manually in 3 seconds (select all → Transitions → Morph)
+- **File Size**: Output presentations are typically 5-15 MB depending on image quality and slide count
+
 ---
 
-**Example**: Convert a 21-slide deck to carousel in under 30 seconds (plus 3 seconds for Morph transitions)
+*Built with python-pptx and PowerPoint COM automation*
