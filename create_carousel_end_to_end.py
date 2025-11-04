@@ -40,12 +40,17 @@ def main():
         help="Input PowerPoint file to convert to carousel"
     )
     parser.add_argument(
-        "template_definition",
-        help="Template definition JSON file (e.g., 'Carousel Presentation Template_definition.json')"
-    )
-    parser.add_argument(
         "output_pptx",
         help="Output carousel PowerPoint file"
+    )
+    parser.add_argument(
+        "--template",
+        default="Carousel Presentation Template_definition.json",
+        help="Template definition JSON file (default: Carousel Presentation Template_definition.json)"
+    )
+    parser.add_argument(
+        "--range",
+        help="Slide range to export (e.g., '3-12', '3..', '..5', '..5,7-9', '1,3,5')"
     )
     parser.add_argument(
         "--keep-temp",
@@ -56,7 +61,7 @@ def main():
     args = parser.parse_args()
     
     input_path = Path(args.input_pptx)
-    template_path = Path(args.template_definition)
+    template_path = Path(args.template)
     output_path = Path(args.output_pptx)
     
     # Validate inputs
@@ -82,8 +87,12 @@ def main():
     print(f"Temp images: {images_folder}")
     
     # Step 1: Export slides as images and create definition
+    export_cmd = [sys.executable, "pptx_to_definition.py", str(input_path), "--export-images"]
+    if args.range:
+        export_cmd.extend(["--range", args.range])
+    
     if not run_command(
-        [sys.executable, "pptx_to_definition.py", str(input_path), "--export-images"],
+        export_cmd,
         "Step 1: Exporting slides as images..."
     ):
         return 1

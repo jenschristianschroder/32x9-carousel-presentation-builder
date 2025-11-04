@@ -1,63 +1,103 @@
-# PowerPoint Carousel Presentation Builder
+# PowerPoint 32:9 Carousel Presentation Builder
 
-A complete toolkit for creating carousel-style PowerPoint presentations from existing decks.
+Create stunning ultra-wide carousel presentations from any PowerPoint deck with a single command.
 
-## What It Does
+## Quick Start (One Command!)
 
-1. **Extracts** slides from any PowerPoint as high-quality images
-2. **Analyzes** presentation structure (shapes, text, layouts)
-3. **Builds** carousel presentations matching a template design
-4. **All-in-one** command for end-to-end conversion
+```powershell
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx"
+```
 
-## Features
+This single command:
+1. ✅ Extracts all slides as high-quality PNG images
+2. ✅ Builds an ultra-wide (12.6" × 3.54") carousel presentation with:
+   - Black background
+   - Gradient overlays (transparent to black on edges)
+   - Each page centers a different slide with surrounding slides visible
+   - Smooth horizontal scrolling effect
 
-### PPTX Structure Extractor (`pptx_to_definition.py`)
-- Slide + shape geometry (inches)
-- Text paragraphs and runs (font styles, colors, sizes)
-- Tables (cell text, size)
-- **Export each slide as a PNG image** (uses PowerPoint COM)
-- Group shape children flattened
-- Minimal chart stub metadata
-- Notes text per slide
-- Slide layout name + overall dimensions
+### Add Morph Transitions (Takes 3 seconds!)
+1. Open `Output_Carousel.pptx` in PowerPoint
+2. Select all slides (`Ctrl+A`)
+3. Go to **Transitions** tab → Click **Morph**
+4. Done! ✨
 
-## Install
+## Installation
 ```powershell
 pip install -r requirements.txt
 ```
 
-## Quick Start
+**Requirements:**
+- Python 3.7+
+- Microsoft PowerPoint (for slide export)
+- Windows OS (PowerPoint COM automation)
 
-### End-to-End Carousel Creation (Recommended)
+## What You Get
+
+The carousel presentation features:
+- **Ultra-wide format**: 12.6" × 3.54" (32:9 aspect ratio)
+- **Cinematic layout**: Center slide is prominent, surrounding slides fade with gradients
+- **Progressive navigation**: Each page advances one slide through the carousel
+- **Professional styling**: Black background with directional gradients on edges
+
+## Advanced Usage
+
+### Export Specific Slides
 ```powershell
-# One command does it all!
-python create_carousel_end_to_end.py "Innovate with AI Apps and Agents - Deck.PPTX" "Carousel Presentation Template_definition.json" "Output_Carousel.pptx"
+# Export slides 3-12 only
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --range "3-12"
 
-# Keep intermediate files for inspection
-python create_carousel_end_to_end.py "MyDeck.pptx" "Carousel Presentation Template_definition.json" "Output.pptx" --keep-temp
+# Export from slide 10 to the end
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --range "10.."
+
+# Export first 5 slides
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --range "..5"
+
+# Export multiple ranges (slides 1-5 and 7-9)
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --range "..5,7-9"
+
+# Export specific slides only
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --range "1,3,5,7"
 ```
 
-## Individual Tools
-
-### 1. Extract Slides & Definition
+### Keep Intermediate Files
 ```powershell
-# Export slides as images + create JSON definition
-python pptx_to_definition.py "MyDeck.pptx" --export-images
+# Keep the extracted images and definition files for inspection
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --keep-temp
+```
 
-# YAML output instead
+### Use Custom Template
+```powershell
+# Use a different template design
+python create_carousel_end_to_end.py "MyPresentation.pptx" "Output_Carousel.pptx" --template "MyCustomTemplate_definition.json"
+```
+
+### Manual Two-Step Process
+
+If you need more control, run the steps separately:
+
+#### Step 1: Extract Slides
+```powershell
+python pptx_to_definition.py "MyPresentation.pptx" --export-images
+```
+
+#### Step 2: Build Carousel
+```powershell
+python build_carousel_from_template.py "Carousel Presentation Template_definition.json" "MyPresentation_images/" "Output_Carousel.pptx"
+```
+
+### Extract Options
+```powershell
+# Export specific slide range
+python pptx_to_definition.py "MyDeck.pptx" --export-images --range "5-15"
+
+# Export as YAML instead of JSON
 python pptx_to_definition.py "MyDeck.pptx" -f yaml --export-images
-
-# Limit to first 5 slides
-python pptx_to_definition.py "MyDeck.pptx" --max-slides 5 --export-images
 ```
 
-### 2. Build Carousel from Template
-```powershell
-# Using template design
-python build_carousel_from_template.py "Carousel Presentation Template_definition.json" "MyDeck_images/" "Carousel_Output.pptx"
-```
+### Alternative Layouts
 
-### 3. Simple Carousel (Grid Layout)
+#### Grid-Based Carousel
 ```powershell
 # 4 slides per page in a grid
 python build_carousel.py "MyDeck_images/" "GridCarousel.pptx" --slides-per-page 4
@@ -66,108 +106,122 @@ python build_carousel.py "MyDeck_images/" "GridCarousel.pptx" --slides-per-page 
 python build_carousel.py "MyDeck_images/" "GridCarousel.pptx" --slides-per-page 6
 ```
 
-### 4. Rebuild Presentation from Definition
+#### Rebuild from Definition
 ```powershell
-# Recreate presentation from definition + images
+# Recreate original presentation from definition + images
 python build_from_definition.py "MyDeck_definition.json" "MyDeck_images/" "Rebuilt.pptx"
-
-# Custom dimensions (32:9 format)
-python build_from_definition.py "MyDeck_definition.json" "MyDeck_images/" "Rebuilt.pptx" --width 16 --height 9
 ```
 
-## Output Schema (simplified)
-```yaml
-source_file: MyDeck.pptx
-metadata:
-  slide_width_inches: 16.0
-  slide_height_inches: 9.0
-  slide_count: 20
-slides:
-  - index: 1
-    layout_name: Title Slide
-    notes: "Welcome notes"
-    shapes:
-      - id: 3
-        name: Title 1
-        type: placeholder
-        left_inches: 1.0
-        top_inches: 1.2
-        width_inches: 10.0
-        height_inches: 1.4
-        rotation: 0.0
-        has_text_frame: true
-        text: "Project Overview"
-        paragraphs:
-          - alignment: CENTER
-            runs:
-              - text: Project Overview
-                font:
-                  name: Calibri
-                  size_pt: 44.0
-                  bold: true
-                  italic: false
-                  underline: null
-                  color_hex: "#FFFFFF"
-```
-
-## File Structure
+## Project Structure
 
 ```
 32x9 carousel presentation builder/
-├── pptx_to_definition.py              # Extract slides + structure
-├── build_carousel_from_template.py    # Build using template design  
-├── build_carousel.py                  # Build with grid layout
+├── pptx_to_definition.py              # Extract slides as images
+├── build_carousel_from_template.py    # Build carousel from template  
+├── build_carousel.py                  # Alternative grid layout
 ├── build_from_definition.py           # Rebuild from definition
 ├── create_carousel_end_to_end.py      # All-in-one script
-├── quick_test.py                      # Quick validation tool
 ├── requirements.txt                   # Python dependencies
-├── Carousel Presentation Template.pptx         # Template file
-├── Carousel Presentation Template_definition.json  # Template design
-└── README.md
+├── Carousel Presentation Template.pptx            # Template file
+├── Carousel Presentation Template_definition.json # Template structure
+└── README.md                          # This file
 ```
+
+## Output Definition Schema (Optional)
+
+The extractor can also create JSON/YAML definitions with full presentation structure:
+
+```yaml
+source_file: MyDeck.pptx
+metadata:
+  slide_width_inches: 10.0
+  slide_height_inches: 7.5
+  slide_count: 21
+slides:
+  - index: 1
+    layout_name: Title Slide
+    slide_image: slide_001.png
+    shapes:
+      - name: Title 1
+        type: placeholder
+        left_inches: 1.0
+        top_inches: 1.2
+        width_inches: 8.0
+        height_inches: 1.5
+        text: "My Presentation"
+```
+
+This definition enables advanced scenarios like rebuilding presentations or analyzing structure.
 
 ## How It Works
 
-1. **`pptx_to_definition.py`**: Uses PowerPoint COM automation to export each slide as a PNG image, and python-pptx to extract structure
-2. **`build_carousel_from_template.py`**: Analyzes template layout and replicates the design with your slides
-3. **`create_carousel_end_to_end.py`**: Orchestrates both steps automatically
+1. **Slide Export**: Uses PowerPoint COM automation to export each slide as a high-quality PNG image
+2. **Template Analysis**: Reads the carousel template design (positions, gradients, layout)
+3. **Carousel Generation**: Creates ultra-wide presentation with slides arranged in carousel pattern
+4. **Manual Polish**: Apply Morph transitions in PowerPoint for smooth animations (3 seconds!)
+
+## Why Manual Morph Transitions?
+
+The `python-pptx` library doesn't support adding transitions to slides. The fastest, most reliable method is:
+- Select all slides (Ctrl+A) → Transitions tab → Click Morph
+- Takes literally 3 seconds and works perfectly every time
+
+### Known Issue: Morph Transition Behavior
+
+**Issue**: When input slides are very similar, PowerPoint's Morph transition may morph individual slide images instead of creating the smooth carousel scrolling effect.
+
+**Cause**: PowerPoint detects similar content across slides and tries to morph matching elements rather than the overall layout.
+
+**Solution**: Ensure your input slides are visually distinct enough:
+- Use different layouts, colors, or content on each slide
+- Avoid slides with identical backgrounds or repeated elements
+- Add unique visual elements (logos, page numbers, different images) to each slide
+
+**Alternative**: If slides must be similar, you can manually adjust the Morph transition settings in PowerPoint or use a Fade transition instead for consistent animation.
 
 ## Template Design
 
-The `Carousel Presentation Template.pptx` defines:
-- Ultra-wide format (12.6" x 3.54")
-- Horizontal scrolling carousel effect
-- 3 slides visible per page: left (partial), center (full), right (partial)
-- Decorative side panels
-- Smooth progression (advances 1 slide at a time)
+The included `Carousel Presentation Template.pptx` defines:
+- **Format**: 12.6" × 3.54" ultra-wide (32:9)
+- **Layout**: Horizontal carousel with 3-5 slides visible per page
+- **Styling**: Black background with transparent-to-black gradients on edges
+- **Pattern**: Each page centers a different slide, creating smooth scrolling effect
 
-## Test Harness
-```powershell
-# Quick validation (first 2 slides by default)
-python quick_test.py MyDeck.pptx
+### Creating Your Own Template
 
-# Test first 5 slides
-python quick_test.py MyDeck.pptx 5
-```
+To create a custom carousel template:
 
-## Requirements
+1. **Design your template** in PowerPoint with your desired layout, dimensions, and styling
+2. **Generate the template definition**:
+   ```powershell
+   python pptx_to_definition.py "MyCustomTemplate.pptx"
+   ```
+   This creates `MyCustomTemplate_definition.json`
+3. **Use your custom template**:
+   ```powershell
+   python create_carousel_end_to_end.py "Input.pptx" "Output.pptx" --template "MyCustomTemplate_definition.json"
+   ```
 
-- Python 3.7+
-- Microsoft PowerPoint (for slide export via COM automation)
-- Windows OS (due to COM automation dependency)
-
-## Limitations
-
-- Chart data values not extracted (python-pptx limitation)
-- Advanced SmartArt, animations, media represented only by type
-- Theme color palette not fully exposed
-- Requires PowerPoint installed for slide export
+**Template Requirements:**
+- Include sample slides showing the carousel pattern progression
+- Each slide should contain picture placeholders positioned where slide images will appear
+- Optional: Add gradient rectangles or decorative elements that will be replicated
 
 ## Troubleshooting
 
-**PowerPoint COM Error**: Ensure PowerPoint is installed and you have appropriate permissions  
-**Image Export Issues**: Check that the input PowerPoint file is not corrupted  
-**Memory Issues**: For very large presentations, use `--max-slides` to process in batches
+**"Package not found" or file can't be opened**: Input PowerPoint files must have **General** sensitivity label (no encryption). Remove sensitivity labels from files before processing.  
+**"PowerPoint COM Error"**: Ensure PowerPoint is installed and not running in protected mode  
+**"Permission denied saving file"**: Close the output file if it's already open in PowerPoint  
+**"No images found"**: Make sure to use `--export-images` flag when extracting slides  
+**"Module not found"**: Run `pip install -r requirements.txt` to install dependencies
+
+## System Requirements
+
+- **Python**: 3.7 or higher
+- **PowerPoint**: Microsoft PowerPoint (any recent version)
+- **OS**: Windows (required for PowerPoint COM automation)
+- **Memory**: Sufficient for loading presentation images (~50MB per deck)
 
 ---
-Created for flexible carousel presentation generation.
+
+**Example**: Convert a 21-slide deck to carousel in under 30 seconds (plus 3 seconds for Morph transitions)

@@ -19,6 +19,47 @@ except ImportError:  # pragma: no cover
 # Utility helpers
 # -----------------------------
 
+def parse_slide_range(range_str: str, total_slides: int) -> List[int]:
+    """
+    Parse slide range string and return list of slide indices (1-based).
+    
+    Examples:
+        "3-12"      -> slides 3 to 12
+        "3.."       -> slides 3 to last
+        "..5"       -> slides 1 to 5
+        "..5,7-9"   -> slides 1-5 and 7-9
+        "1,3,5"     -> slides 1, 3, and 5
+    """
+    if not range_str:
+        return list(range(1, total_slides + 1))
+    
+    slide_indices = set()
+    
+    # Split by comma for multiple ranges
+    parts = [p.strip() for p in range_str.split(',')]
+    
+    for part in parts:
+        if '..' in part:
+            # Handle range with ".."
+            start_str, end_str = part.split('..', 1)
+            start = int(start_str) if start_str else 1
+            end = int(end_str) if end_str else total_slides
+            slide_indices.update(range(start, end + 1))
+        elif '-' in part:
+            # Handle range with "-"
+            start_str, end_str = part.split('-', 1)
+            start = int(start_str)
+            end = int(end_str)
+            slide_indices.update(range(start, end + 1))
+        else:
+            # Single slide number
+            slide_indices.add(int(part))
+    
+    # Filter to valid range and sort
+    valid_indices = [i for i in sorted(slide_indices) if 1 <= i <= total_slides]
+    return valid_indices
+
+
 def emu_to_points(value: Emu) -> float:
     return float(value) / 12700.0  # 1 point = 12700 EMUs
 
@@ -177,6 +218,7 @@ def extract_presentation_definition(
     pptx_path: Path,
     export_images: bool = False,
     max_slides: Optional[int] = None,
+    slide_range: Optional[str] = None,
 ) -> Dict[str, Any]:
     prs = Presentation(str(pptx_path))
 
@@ -190,11 +232,21 @@ def extract_presentation_definition(
         "slides": [],
     }
 
-    for idx, slide in enumerate(prs.slides, start=1):
-        if max_slides and idx > max_slides:
-            break
+    # Determine which slides to process
+    total_slides = len(prs.slides)
+    if slide_range:
+        slide_indices = parse_slide_range(slide_range, total_slides)
+    elif max_slides:
+        slide_indices = list(range(1, min(max_slides + 1, total_slides + 1)))
+    else:
+        slide_indices = list(range(1, total_slides + 1))
+    
+    print(f"Processing {len(slide_indices)} of {total_slides} slides: {slide_indices if len(slide_indices) <= 10 else f'{slide_indices[:5]}...{slide_indices[-5:]}'}")
 
-        print(f"Processing slide {idx}/{len(prs.slides)}...")
+    for idx in slide_indices:
+        slide = prs.slides[idx - 1]  # Convert to 0-based index
+        
+        print(f"Processing slide {idx}/{total_slides}...")
         
         # Export entire slide as image if requested
         slide_image_file = None
@@ -310,7 +362,11 @@ def parse_args():
         help="Export each slide as a PNG image to a folder",
     )
     parser.add_argument(
-        "--max-slides", type=int, help="Limit number of slides processed"
+        "--max-slides", type=int, help="Limit number of slides processed (deprecated, use --range)"
+    )
+    parser.add_argument(
+        "--range",
+        help="Slide range to export (e.g., '3-12', '3..', '..5', '..5,7-9', '1,3,5')"
     )
     parser.add_argument(
         "--pretty", action="store_true", help="Pretty print (JSON only)"
@@ -334,6 +390,7 @@ def main():
         pptx_path=pptx_path,
         export_images=args.export_images,
         max_slides=args.max_slides,
+        slide_range=args.range,
     )
 
     text = serialize_definition(definition, args.format)
