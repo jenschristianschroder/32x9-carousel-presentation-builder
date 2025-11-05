@@ -2,6 +2,12 @@
 
 Create stunning ultra-wide carousel presentations from any PowerPoint deck with a single command.
 
+## Demo
+
+https://github.com/user-attachments/assets/32x9%20Carousel%20Presentation.mp4
+
+*See the carousel in action with smooth Morph transitions*
+
 ## Quick Start (One Command!)
 
 ```powershell
